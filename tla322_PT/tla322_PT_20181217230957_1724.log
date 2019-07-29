@@ -1,0 +1,89 @@
+[2018-12-17 23:10:07]	1724  	INFO 	192.168.5.157 ssh_keygen_login success!
+[2018-12-17 23:10:15]	1724  	INFO 	192.168.5.194 ssh_keygen_login success!
+[2018-12-17 23:10:16]	1724  	INFO 	DBC_count=1
+[2018-12-17 23:10:16]	1724  	INFO 	tla322 rename tla322_Pt.bak
+[2018-12-17 23:10:16]	1724  	INFO 	meter before kill npp success!
+[2018-12-17 23:10:16]	1724  	INFO 	meter before trace_count=74043977
+[2018-12-17 23:10:16]	1724  	INFO 	Get obj_summary_flag=1
+[2018-12-17 23:10:16]	1724  	INFO 	meter before obj_table_count=705177
+[2018-12-17 23:10:16]	1724  	INFO 	And_meter Begin time=2018-12-17 23:10:16
+[2018-12-17 23:10:16]	1724  	INFO 	meter1 Begin run! meter_param: --worker 1 --loop 1 --pps 20000 eth5 /home/meter/192.168.0.147-1521-orcl-2hournewsql-2.pcapng
+[2018-12-17 23:10:16]	1724  	INFO 	meter1 Begin time=2018-12-17 23:10:16
+[2018-12-17 23:10:17]	1724  	INFO 	And_meter1 Begin run!,And_meter1_param: --worker 1 --loop 1 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:10:17]	1724  	INFO 	And_meter2 Begin run!,And_meter2_param: --worker 1 --loop 2 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:12:01]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:12:01]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:12:02]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:12:42]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:12:43]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:12:43]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:13:23]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:13:23]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:13:23]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:14:45]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:14:45]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:14:45]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:15:42]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:15:42]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:15:42]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:16:23]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:16:23]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:16:23]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:17:03]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:17:04]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:17:04]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:17:43]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:17:44]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:17:44]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:18:23]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:18:24]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:18:24]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:19:03]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:19:03]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:19:04]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:19:43]	1724  	INFO 	meter1 running,Need to wait!
+[2018-12-17 23:19:43]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:19:43]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:19:49]	1724  	INFO 	And_meter1 Begin run!,And_meter1_param: --worker 1 --loop 1 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:19:57]	1724  	INFO 	meter1 End time=2018-12-17 23:19:57
+[2018-12-17 23:19:57]	1724  	INFO 	meter1 Use time=581
+[2018-12-17 23:19:57]	1724  	INFO 	meter2 Begin run! meter_param: --worker 1 --loop 1 --pps 20000 eth1 /home/meter/object_summary1.pcapng
+[2018-12-17 23:19:57]	1724  	INFO 	meter2 Begin time=2018-12-17 23:19:57
+[2018-12-17 23:20:15]	1724  	INFO 	meter2 End time=2018-12-17 23:20:15
+[2018-12-17 23:20:16]	1724  	INFO 	meter2 Use time=18
+[2018-12-17 23:20:21]	1724  	INFO 	Get tlog_count=372
+[2018-12-17 23:20:21]	1724  	INFO 	First tlog_name=INST_tlog_20181217231802.246
+[2018-12-17 23:20:21]	1724  	INFO 	Last tlog_name=INST_tlog_20181217232020.617
+[2018-12-17 23:20:21]	1724  	INFO 	Not Retain tlog_file
+[2018-12-17 23:20:21]	1724  	INFO 	restore tla322
+[2018-12-17 23:20:21]	1724  	INFO 	tlog Analysis Begin time=2018-12-17 23:20:21
+[2018-12-17 23:20:21]	1724  	INFO 	nmon Begin run! nmon_pid=2183,output file dir:/home/tla322_PT/data_nmon
+[2018-12-17 23:20:52]	1724  	INFO 	And_meter2 Begin run!,And_meter2_param: --worker 1 --loop 2 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:20:57]	1724  	INFO 	And_meter1 Begin run!,And_meter1_param: --worker 1 --loop 1 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:21:01]	1724  	INFO 	tlog Analysis running,Need to wait!
+[2018-12-17 23:21:01]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:21:02]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:21:42]	1724  	INFO 	tlog Analysis running,Need to wait!
+[2018-12-17 23:21:42]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:21:42]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:22:01]	1724  	INFO 	And_meter1 Begin run!,And_meter1_param: --worker 1 --loop 1 --pps 20000 eth5 /home/meter/sto2.pcap
+[2018-12-17 23:22:24]	1724  	INFO 	tlog Analysis running,Need to wait!
+[2018-12-17 23:22:24]	1724  	INFO 	And_meter1 running!
+[2018-12-17 23:22:24]	1724  	INFO 	And_meter2 running!
+[2018-12-17 23:22:41]	1724  	INFO 	tlog Analysis completed! End time=2018-12-17 23:22:41
+[2018-12-17 23:22:42]	1724  	INFO 	kill And_meter1
+[2018-12-17 23:22:42]	1724  	INFO 	And_meter1 run count=4
+[2018-12-17 23:22:42]	1724  	INFO 	kill And_meter2
+[2018-12-17 23:22:42]	1724  	INFO 	And_meter2 run count=2
+[2018-12-17 23:22:53]	1724  	INFO 	tlog Analysis after trace_count=75883990
+[2018-12-17 23:22:53]	1724  	INFO 	meter after obj_table_count=705182
+[2018-12-17 23:22:53]	1724  	INFO 	meter totel Use time=599
+[2018-12-17 23:22:54]	1724  	INFO 	OS_CPU_Core=8;OS_MEM=32G;OS_SYS_DISK=2000.4G
+[2018-12-17 23:22:54]	1724  	ERROR	version_main Record version error! soft_version=DBA3.2.4.5
+[2018-12-17 23:22:54]	1724  	INFO 	version_main Record Correct version should be DBA3.2.4.6
+[2018-12-17 23:22:54]	1724  	INFO 	Version support object_summary!
+[2018-12-17 23:22:54]	1724  	INFO 	objects summary switch state: Open! S_OBJECTS_SWITCH=1
+[2018-12-17 23:22:54]	1724  	INFO 	obj_table incr count=5
+[2018-12-17 23:22:54]	1724  	INFO 	tlog Analysis Use time=140s
+[2018-12-17 23:22:54]	1724  	INFO 	trace_logs_detail_part incr count=1840013
+[2018-12-17 23:22:54]	1724  	INFO 	trace_logs_detail_part per-second count=13142
