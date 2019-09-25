@@ -169,7 +169,7 @@ do
 done
 
 ## sysctl param ##
-sysctl -p | sort | uniq > $sysctl_file
+cat /etc/sysctl.conf > $sysctl_file
 
 cp -af ./$dump_file/local_files/dbfw/etc/dbfw50.ini $dump_file/
 cp -af ./$dump_file/local_files/dbfw/etc/totalconfig.lst $dump_file/

@@ -25,6 +25,10 @@ product_file_list=(
 	/usr/lib64/perl5
 	/usr/share/snmp
 	/etc/init.d/stopdbfw
+	/var/tmp
+	/tmp
+	/dev/shm/
+	/etc/producttype
 )
 
 ## no create md5 file ##
@@ -74,7 +78,8 @@ table_list_file="$dump_file/table_list"
 procedure_sql="$dump_file/procedure_sql"
 md5_file="$dump_file/product_md5"
 permission_file="$dump_file/product_permission"
-sysctl_file="$dump_file/sysctl_p"
+sysctl_file1="$dump_file/sysctl_config_file"
+sysctl_file2="$dump_file/sysctl_display_system_param"
 
 rm -rf $dump_file
 mkdir $dump_file
@@ -186,16 +191,24 @@ do
 done
 	
 ## sysctl param ##
-sysctl -p | sort | uniq > $sysctl_file
+#sysctl -p | sort | uniq > $sysctl_file
+cat /etc/sysctl.conf > $sysctl_file1
+sysctl -a | sort | uniq > $sysctl_file2
 
 
 ##cp config file
 configfile="$dump_file/configfile"
 mkdir $configfile
-cp /home/dbfw/dbfw/etc/dbfw50.ini* $configfile
-cp /home/dbfw/dbfw/etc/totalconfig.lst $configfile
-cp /usr/local/tomcat/webapps/ROOT/WEB-INF/configures.properties $configfile
-cp /home/dbfw/dbfw/scripts/dc/dbfw_param_config_default.sql $configfile
+cp -af /home/dbfw/dbfw/etc/dbfw50.ini* $configfile
+cp -af /home/dbfw/dbfw/etc/totalconfig.lst $configfile
+cp -af /usr/local/tomcat/webapps/ROOT/WEB-INF/configures.properties $configfile
+cp -af /home/dbfw/dbfw/scripts/dc/dbfw_param_config_default.sql $configfile
+cp -af /etc/sysconfig/iptables $configfile
+iptables -L -n -v >> $configfile/iptables_cmd.txt
+cp -af /etc/sysconfig/ip6tables $configfile
+ip6tables -L -n -v >> $configfile/ip6tables_cmd.txt
+cp -af /etc/sysconfig/arptables $configfile
+arptables -L -n -v >> $configfile/arptables_cmd.txt
 crontab -l >> $configfile/crontab.txt
 
 dbfwsystem_table="$dump_file/dbfwsystem_table"
@@ -228,6 +241,10 @@ product_dir_list=(
         /usr/lib64/perl5
         /usr/share/snmp
         /etc/init.d/stopdbfw
+	/var/tmp
+	/tmp
+	/dev/shm/
+	/etc/producttype
 )
 dirlist_permission()
 {
@@ -278,6 +295,10 @@ product_dir_list=(
 	/usr/lib64/perl5
 	/usr/share/snmp
 	/etc/init.d/stopdbfw
+	/var/tmp
+	/tmp
+	/dev/shm/
+	/etc/producttype
 )
 ln_files()
 	{
