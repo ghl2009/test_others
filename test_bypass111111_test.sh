@@ -11,7 +11,7 @@ if [[ $bypass_cmd == "bp_ctl5130" ]];then
         bypass_on_cmd="/home/dbfw/dbfw/bin/$bypass_cmd 99 set_bypass_pwon on"
         echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_on_cmd=$bypass_on_cmd"
         bypass_off_cmd="/home/dbfw/dbfw/bin/$bypass_cmd 99 set_bypass_pwon off"
-        echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_off_cmd=$bypass_off_cmd"
+        echo "[a`date '+%Y-%m-%d %H:%M:%S'`] bypass_off_cmd=$bypass_off_cmd"
 elif [[ $bypass_cmd == "bp_ctl5132" ]];then
         bypass_on_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 1"
         echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_on_cmd=$bypass_on_cmd"
