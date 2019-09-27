@@ -16,11 +16,21 @@ elif [[ $bypass_cmd == "bp_ctl5132" ]];then
         bypass_on_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 1"
         echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_on_cmd=$bypass_on_cmd"
         bypass_off_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 0"
-                                wait_count=$((wait_count+1))
         echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_off_cmd=$bypass_off_cmd"
 elif [[ $bypass_cmd == "bpctl_util" ]];then
         :
+elif [[ $bypass_cmd == "bp_ctl5174" ]];then
+        bypass_on_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 1"
+        echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_on_cmd=$bypass_on_cmd"
+        bypass_off_cmd="/home/dbfw/dbfw/bin/$bypass_cmd  bpon 99 0 0"
+        echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_off_cmd=$bypass_off_cmd"
+elif [[ $bypass_cmd == "bp_ctl5170" ]];then
+        bypass_on_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 1"
+        echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_on_cmd=$bypass_on_cmd"
+        bypass_off_cmd="/home/dbfw/dbfw/bin/$bypass_cmd bpon 99 0 0"
+        echo "[`date '+%Y-%m-%d %H:%M:%S'`] bypass_off_cmd=$bypass_off_cmd"
 fi
+
 x_packets_avg=0
 for i in `seq 1 10`
         do
@@ -53,6 +63,9 @@ while true
 		#echo "[0000-00-00 00:00:00],0,0,0,0,0" >> test_bypass.report
                 echo "[`date '+%Y-%m-%d %H:%M:%S'`] run_count=$run_count"
 		usleep_time=$((RANDOM*50))
+		if [[ $bypass_cmd == "bp_ctl5170" ]] || [[ $bypass_cmd == "bp_ctl5174" ]];then
+			usleep_time=$((usleep_time+1000000))
+		fi
 		echo "[`date '+%Y-%m-%d %H:%M:%S'`] usleep_time=$usleep_time"
                 $bypass_on_cmd
 		usleep $usleep_time
@@ -62,7 +75,7 @@ while true
 		success_wait_count=0
 		success_wait_count1=0
 		success_wait_count2=0
-                while [[ $success_wait_count -lt 12 ]]
+                while [[ $success_wait_count -lt 5 ]]
                         do
                                 x_packets_list=(`cat /dev/shm/dpdk/dpdk_nic_stats |grep x_packets|awk 'NR<=4&&NR>=0{print $3}'`)
                                 echo "[`date '+%Y-%m-%d %H:%M:%S'`] x_packets_list=${x_packets_list[*]}"
