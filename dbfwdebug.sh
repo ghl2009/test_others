@@ -1,0 +1,3 @@
+shmid=`ipcs -m|grep dbfw|head -n1|awk '{print $2}'`;dbfwdebug $shmid sessions t sessions.txt>/dev/null;flag_old=`cat sessions.txt |grep use_flag|awk '{print $2}'`;echo "flag_old=$flag_old";num=1;echo "num=$num";sleep 10;while true;do shmid=`ipcs -m|grep dbfw|head -n1|awk '{print $2}'`;dbfwdebug $shmid sessions t sessions.txt>/dev/null;flag=`cat sessions.txt |grep use_flag|awk '{print $2}'`;echo $flag;if [[ $flag -eq $flag_old ]];then num=$((num+1));echo "num=$num";else flag_old=$flag;num=1;echo "num=$num";fi;sleep 10;done
+
+while true;do shmid=`ipcs -m|grep dbfw|head -n1|awk '{print $2}'`;dbfwdebug $shmid proxy t proxy.txt>/dev/null;cat proxy.txt |grep "Tis Content";usleep 1000000;done
