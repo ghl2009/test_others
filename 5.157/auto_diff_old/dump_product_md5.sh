@@ -217,7 +217,6 @@ cp -af /home/dbfw/dbfw/etc/csv_dataflow_fields.ini $configfile
 cp -af /home/dbfw/dbfw/etc/totalconfig.lst $configfile
 cp -af /usr/local/tomcat/webapps/ROOT/WEB-INF/configures.properties $configfile
 cp -af /usr/local/tomcat/webapps/MMS/WEB-INF/configures.properties $configfile/MMS_configures.properties
-cp -af /usr/local/tomcat/webapps/token/WEB-INF/configures.properties $configfile/token_configures.properties
 cp -af /home/dbfw/dbfw/scripts/dc/dbfw_param_config_default.sql $configfile
 cp -af /etc/sysconfig/iptables $configfile
 iptables -L -n -v >> $configfile/iptables_cmd.txt
@@ -227,8 +226,6 @@ cp -af /etc/sysconfig/arptables $configfile
 arptables -L -n -v >> $configfile/arptables_cmd.txt
 cp -af /etc/sysconfig/etables $configfile
 crontab -l >> $configfile/crontab.txt
-
-cp -af /dbfw_bkup/dc/ $configfile
 
 dbfwsystem_table="$dump_file/dbfwsystem_table"
 mkdir $dbfwsystem_table

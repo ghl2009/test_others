@@ -10,6 +10,7 @@ permission_folder="$dump_file/product_permission_folder"
 product_file_list=(
     /home/dbfw/dbfw
     /dbfw_capbuf
+    /dbfw_data/dbfw
     /usr/local/tomcat
     /usr/local/rmagent/rmagent-dist
     /home/conadmin/menu.sh
@@ -41,10 +42,6 @@ product_file_list=(
     /etc/sysconfig/iptables
     /etc/sysconfig/arptables
     /etc/sysconfig/ebtables
-    /dbfw_data/dbfw
-    /dbfw_data/dbfw_capbuf
-    /dbfw_data/tomcat
-    /dbfw_data/apache
 )
 
 ## no create md5 file ##
@@ -63,7 +60,6 @@ no_create_md5_list=(
     /home/dbfw/dbfw/scripts/repairtable/conf/day_check_flag
     /home/dbfw/dbfw/scripts/repairtable/conf/part_file_backup_history
     /home/dbfw/dbfw/scripts/repairtable/conf/process_handle_num_note
-    /dbfw_data/dbfw_capbuf
 )
 
 ## dbfw Don't compare data list ##
@@ -93,7 +89,6 @@ rm -f all_list skip_list result_list
 mkdir -p ./$dump_file/local_files
 for file in ${product_file_list[@]}
 do 
-    if [ -L "$file" ];then continue;fi
     find $file -type f >> all_list 2>/dev/null
     cp -raf $file ./$dump_file/local_files/ 2>/dev/null
 done
@@ -102,26 +97,24 @@ done
 > skip_list
 for file in ${no_create_md5_list[@]}
 do 
-    if [ -L "$file" ];then continue;fi
     find $file -type f >> skip_list 2>/dev/null
 done
 
 # 从A列表中过滤掉B列表
 grep -v -f skip_list all_list > result_list 2>/dev/null
 
-cat result_list | uniq | sort -k 2 | xargs -i md5sum "{}" > $md5_file
-cat result_list | uniq | sort -k 2 | xargs -i ls -l "{}"| awk '{print $1" "$3" "$4" "$9}' > $permission_file
+cat result_list | uniq | sort -k 2 | xargs md5sum > $md5_file
+cat result_list | uniq | sort -k 2 | xargs ls -l | awk '{print $1" "$3" "$4" "$9}' > $permission_file
 
 # 在所有文件列表中增加文件夹  用于获取文件夹权限
 > result_list
 for file in ${product_file_list[@]}
 do 
-    if [ -L "$file" ];then continue;fi
     if [ -d $file ];then
         find $file -type d >> result_list
     fi
 done
-cat result_list | uniq | sort -k 2 | xargs -i ls -ld "{}" | awk '{print $1" "$3" "$4" "$9}' >> $permission_folder
+cat result_list | uniq | sort -k 2 | xargs ls -ld | awk '{print $1" "$3" "$4" "$9}' >> $permission_folder
 
 rm -f all_list skip_list result_list
 
@@ -134,11 +127,11 @@ do
         fi
     fi
 
-    execute_sql="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataView -h127.0.0.1 -P$port -uroot -pDBSec@1234 --default-character-set=utf8"
-    dump_table="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --skip-extended-insert -h127.0.0.1 -P$port -uroot -pDBSec@1234 --default-character-set=utf8"
-    dump_table_no_data="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-data -h127.0.0.1 -P$port -uroot -pDBSec@1234 --default-character-set=utf8"
-    dump_table_no_create="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-create-info --skip-extended-insert -h127.0.0.1 -P$port -uroot -pDBSec@1234 --default-character-set=utf8"
-    dump_procedure="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-create-db --no-create-info --no-data --routines -h127.0.0.1 -P$port -uroot -pDBSec@1234 dbfw --default-character-set=utf8"
+    execute_sql="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataView -h127.0.0.1 -P$port -uroot -p1 --default-character-set=utf8"
+    dump_table="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --skip-extended-insert -h127.0.0.1 -P$port -uroot -p1 --default-character-set=utf8"
+    dump_table_no_data="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-data -h127.0.0.1 -P$port -uroot -p1 --default-character-set=utf8"
+    dump_table_no_create="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-create-info --skip-extended-insert -h127.0.0.1 -P$port -uroot -p1 --default-character-set=utf8"
+    dump_procedure="/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataDump --compact --no-create-db --no-create-info --no-data --routines -h127.0.0.1 -P$port -uroot -p1 dbfw --default-character-set=utf8"
         
     table_list_file="$dump_file/${port}/table_list"
     create_sql="$dump_file/${port}/create_sql"
@@ -192,9 +185,6 @@ cat /etc/sysctl.conf > $sysctl_file
 cp -af ./$dump_file/local_files/dbfw/etc/dbfw50.ini $dump_file/
 cp -af ./$dump_file/local_files/dbfw/etc/totalconfig.lst $dump_file/
 cp -af ./$dump_file/local_files/tomcat/webapps/ROOT/WEB-INF/configures.properties $dump_file/
-cp -af ./$dump_file/local_files/tomcat/webapps/MMS/WEB-INF/configures.properties $dump_file/
-cp -af ./$dump_file/local_files/dbfw/etc/sql_kafka_dataflow_fields.ini $dump_file/
-cp -af ./$dump_file/local_files/dbfw/etc/csv_dataflow_fields.ini $dump_file/
 
 exit 0;
 
