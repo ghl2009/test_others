@@ -1,0 +1,729 @@
+/*开机启动*/
+/etc/init.d/StartDbfw   
+
+/*手动运行检查及修表*/
+su dbfw -c "/home/dbfw/dbfw/scripts/repairtable/repairtables.sh cron >>/dev/null 2>&1" 
+su dbfw -c "/home/dbfw/dbfw/scripts/repairtable/repairtables.sh init >>/dev/null 2>&1"  
+su dbfw -c "/home/dbfw/dbfw/scripts/repairtable/repairtables.sh conf >>/dev/null 2>&1"  
+
+
+/*清理全部数据脚本*/
+/scripts/dc/cleardata.sh
+
+/*清理全部数据日志*/
+/dbfw_capbuf/cleardata.log
+
+/*备份日志*/
+tail -f /dbfw_capbuf/pdump/bkup/info/
+
+/*手动备份*/
+dumppart.sh 2017-09-19 dbfw@1234 2  
+
+/*tlc清理分区*/
+/home/dbfw/dbfw/scripts/dc/clearpartusecopy.sh
+
+/*开机日志*/
+/var/log/boot.log
+
+
+/*循环执行一个命令*/
+while true;do ./repairtables.sh conf > r.log;done
+
+
+for num in `seq 1 60`;do ../meter_broadcast --mode modify --server 192.168.1.24:1523=192.168.$num.24:1521 loadrunner.pcap ;mv loadrunner-modify.pcap loadrunner-m-$num.pcap;done
+
+/*循环打多个包*/
+ll |grep "connect*" |awk '{print $9}'>1.txt;while read line;do ./meter_broadcast eth1 $line;done <1.txt;rm -rf 1.txt 
+
+/*执行此存储过程创建分区*/
+call proc_CreateDayPartitionOneTable('20171016','sql_alarms')
+
+/*查看所有定时任务*/
+crontab -l
+
+/*停止定时任务*/
+service crond stop
+
+/*查看系统开机时间*/
+who -b
+
+/*管道抓包*/
+tcpdump -r /tmp/nfw4web_pcap_recv.fifo
+
+/*升级进度文件*/
+/usr/local/apache/upgrade/index.html
+
+
+/*/home/dbfw/dbfw/scripts/dc/restorepart.sh运行日志*/
+/dbfw_capbuf/dumppart.log 
+
+/*同步时间 北京邮电大学*/
+ntpdate 0.asia.pool.ntp.org
+
+
+/*作license平台*/
+http://192.168.1.176:9000/License
+
+/*系统时间，硬件时间，及同步*/
+
+date
+hwclock --show
+hwclock --systohc  
+
+
+
+
+/*单库下sql统计操作类型分为了*/
+select、insert、update、delete、COMMIT、ROLLBACK、BEGIN、DCL、存储过程、DDL、无效SQL、其它
+
+SELECT * FROM `sqltype_detail` where sqltype_1 not in (8,16,32,4,268435456,524288,1048576,0) and typeid not in(4,1,64) ;
+
+
+/*数据库备份恢复页，系统配置备份*脚本*/
+/home/dbfw/dbfw/scripts/dc/dumpconf_manual.sh
+
+
+
+flush table trace_logs_detail_part;
+check table summary_sqltype;
+alter table summary_sqltype check PARTITION P20170921;
+ps -ef | grep -E "/myisamchk|ToolForRepairTable.sh|/repairtables.sh"| grep -v grep | awk '{print $2}'| xargs -i kill -9 {}
+
+/*离线修表*/
+su dbfw -c "/home/dbfw/dbfw/DBCDataCenter/bin/myisamchk -r -q /dbfw_dc/dbfw/trace_logs_detail_part#P#P20170923.MYI"
+/*在线修表*/
+su dbfw -c "/home/dbfw/dbfw/DBCDataCenter/bin/DBCDataView -h127.0.0.1 -uroot -p1 -P9207 dbfw -e alter table sql_alarms_bak repair partition P20171016"
+
+
+/*备份、恢复压力与解压缩*/
+tab="表名"
+part="20171026"
+ip_str="192.168.5.157"
+
+后缀为 .Z 的文件 （不适用与trace_logs_detail_part系列的表）
+
+解压
+dd if=./${tab}_${ip_str}_${part}.MYD.Z|openssl des3 -d -k dbfw@1234 |uncompress -cd |dd of=./${tab}#P#P${part}.MYD
+压缩
+compress -c  ./${tab}#P#P${part}.MYD | openssl des3 -salt -k dbfw@1234 | dd of=/tmp/${tab}_${ip_str}_${part}.MYD.Z
+
+如：dd if=./summary_sqltype_192.168.5.80_20171026.MYD.Z|openssl des3 -d -k dbfw@1234 |uncompress -cd |dd of=./summary_sqltype#P#P20171026.MYD
+    dd if=./summary_sqltype_192.168.5.80_20171026.MYI.Z|openssl des3 -d -k dbfw@1234 |uncompress -cd |dd of=./summary_sqltype#P#P20171026.MYI
+ 
+    compress -c  ./summary_sqltype_bad1#P#P20171026.MYI | openssl des3 -salt -k dbfw@1234 | dd of=/dbfw_bkup/dc/20171026/summary_sqltype_bad1_192.168.5.80_20171026.MYI.Z
+    compress -c  ./summary_sqltype_bad1#P#P20171026.MYD | openssl des3 -salt -k dbfw@1234 | dd of=/dbfw_bkup/dc/20171026/summary_sqltype_bad1_192.168.5.80_20171026.MYD.Z
+
+
+/*解压前台导出的策略同步文件*/
+dd if=dbfw_policy_202007011122.tar.gz | /usr/bin/openssl des3 -d -k 202007011122 | tar zxf - --directory=./
+
+
+/*可以控制响应时间的sql语句*
+declare
+  begin
+    dbms_output.put_line('开始执行时间'||':'||sysdate);
+    dbms_lock.sleep(20);
+    dbms_output.put_line('执行结束时间'||':'||sysdate);
+  end;
+
+
+/*模拟网桥模式npp夯住*/
+gdb attach PID
+b  NPP_ReadTisHeaderFromCapbuf_ForHandleNpc
+
+/*提高cpu占用*/
+for i in `seq 1 $(cat /proc/cpuinfo |grep "physical id" |wc -l)`; do dd if=/dev/zero of=/dev/null & done
+/*提高内存占用*/
+nohup ./mallocmem & 
+
+/*8G的设备不内存告警*/
+
+
+/*虚拟化comadmin密码*/
+PlmOkn2468 
+
+/*虚拟化下设备标识是怎么算出来的*/
+上边那个设备标识(eth0参与了运算），是按老的算法算出来的。后来算法加入了安装时间和设备IP,算出来的是下边那个设备标识
+
+老的那个具说是生产留底用的
+
+
+/*查看内存占用最高的十个进程*/
+ps aux|head -1;ps aux|grep -v PID|sort -rn -k +4|head
+
+
+/*tcpreplay测试性能参数说明*/
+tcpprep -a client -i loadrunner-big-fetch-100-w200-192.168.7.33.7777.pcap -o loadrunner-big-fetch-100-w200-192.168.7.33.7777.cache
+tcpreplay -M 200 -l 20 -c loadrunner-big-fetch-100-w200-192.168.7.33.7777.cache -i eth4 -I eth5 loadrunner-big-fetch-100-w200-192.168.7.33.7777.pcap 
+
+/*网络延迟命令*/
+tc  qdisc  add  dev  eth5  root  netem  delay  1000ms
+
+/*查看进程线程点cpu*/
+top -p 11289 -H
+
+/*查看各线程功能*/
+
+pstack 11289
+
+/*查看进程绑核情况*/
+ps -eLf |grep rms |grep -v grep |awk '{print $4}'|xargs -i taskset -cp {}
+
+taskset -pc 19769
+
+/*url模板索引相关*/
+索引索引的创建没有开始时间和结束时间的概念，在建索引时从模板表拿数据建索引，每次创建只有开始id 结束id的概念，fi_type=60 ,且只有present索引 即9408
+
+
+/*动态密码之前版本后门*/
+108 
+develop1234schina
+进去以后 sudo passwd root 
+
+
+
+/*grup密码*/
+schina5678
+开机按上下箭头  -- 选择设备产品名称 -- "p"输入grup密码 -- 选择 kenol 按“e”编辑 把后半部分删除"rhgb quiet console=tty0 console=ttyS0,9600n8"  -- 按“b”可以看到日志显示 -- 最后输入密码 --修硬盘
+
+
+/* /dbfw_capbuf/pdump/gmon */
+perl 脚本的日志都在这个目录
+
+
+/*虚拟机环境*/
+https://192.168.200.201/
+
+administrator@vsphere.local
+Schina@1234
+
+
+/*hana数据库信息*/
+jdbc:sap://192.168.1.192:39013
+system
+Schina2018
+
+主机ip：192.168.7.42
+虚拟机用户名密码：hxeadm、S2017China
+
+
+
+/*查看网络启动日志*/
+systemctl status network
+
+/*iptable查看策略命令等*/
+iptables -L -n -v
+iptables -t nat -L -n -v
+nc -nvv 192.168.7.152 7788
+ip rule show
+ip route show
+ip addr show
+
+arptables -L -n -v
+
+/*查看系统是否安装了此包*/
+rpm -ihv netcat-0.7.1-1.i386.rpm
+
+/*设置iptable NET转发等*/
+/sbin/ip rule add from 192.168.5.157 tab 1 priority 501
+/sbin/ip rule add from all to 192.168.5.157 tab 1 priority 501
+sysctl -w net.ipv4.ip_forward=1
+/sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp -d 192.168.7.152 --dport 7788 -j DNAT --to-destination 192.168.5.157:9266
+/sbin/iptables -t nat -A POSTROUTING -p tcp -m tcp -d 192.168.5.157 --dport 9266 -j MASQUERADE
+
+
+
+
+/*查看rms进程下有多少线程和socket等*/
+[root@DBSEC_DBA fd]# ps -ef|grep rms
+root      9599     1  2 Mar21 ?        00:27:13 dbfw_INST_rms_20190321135239000 -m 1081345 -t 2
+root     20443 13172  0 08:39 pts/0    00:00:00 grep rms
+[root@DBSEC_DBA fd]# cd /proc/9599
+[root@DBSEC_DBA 9599]# cd fd
+[root@DBSEC_DBA fd]# ll
+total 0
+lr-x------ 1 root root 64 Mar 22 08:38 0 -> /dev/null
+l-wx------ 1 root root 64 Mar 22 08:38 1 -> /dev/null
+lrwx------ 1 root root 64 Mar 22 08:38 10 -> /dev/shm/rmagent/rmagent_stat_192.168.0.252_26970
+lrwx------ 1 root root 64 Mar 22 08:38 11 -> /dev/shm/rmagent/rmagent_stat_192.168.5.80_25173
+l-wx------ 1 root root 64 Mar 22 08:38 12 -> /dbfw_capbuf/pdump/rms/runtime/INST_rms_20190321135239_9599
+l-wx------ 1 root root 64 Mar 22 08:38 13 -> /dbfw_capbuf/pdump/rms/error/INST_rms_20190321135239_9599
+lrwx------ 1 root root 64 Mar 22 08:38 14 -> socket:[8318824]
+lrwx------ 1 root root 64 Mar 22 08:38 15 -> /dev/shm/rmagent/rmagent_stat_192.168.5.194_16612
+l-wx------ 1 root root 64 Mar 22 08:38 2 -> /dev/null
+l-wx------ 1 root root 64 Mar 22 08:38 3 -> /dbfw_capbuf/pdump/rms/info/INST_rms_20190321135239_9599
+l-wx------ 1 root root 64 Mar 22 08:38 4 -> /dbfw_capbuf/pdump/im/info/INST_im_20190321135238_9535.0
+lrwx------ 1 root root 64 Mar 22 08:38 5 -> socket:[2143316]
+lrwx------ 1 root root 64 Mar 22 08:38 6 -> socket:[2143335]
+lrwx------ 1 root root 64 Mar 22 08:38 7 -> [eventpoll]
+lrwx------ 1 root root 64 Mar 22 08:38 8 -> socket:[2143338]
+lrwx------ 1 root root 64 Mar 22 08:38 9 -> socket:[8312878]
+
+/*Centos7.4 获取主机名*/
+hostnamectl --pretty 2>/dev/null || hostname
+
+
+/*产品把开机脚本移走后，网卡不加载的处理办法*/
+[root@DBSEC_DBA dbfw]# cd /lib/modules/dbfw/
+[root@DBSEC_DBA dbfw]# ls
+[root@DBSEC_DBA dbfw]# e1000e.ko  igb.ko  ixgbe.ko
+[root@DBSEC_DBA dbfw]# cp e1000e.ko ../2.6.32-431.el6.x86_64/kernel/drivers/net/e1000e/
+[root@DBSEC_DBA dbfw]# cp igb.ko ../2.6.32-431.el6.x86_64/kernel/drivers/net/igb/
+[root@DBSEC_DBA dbfw]# cp ixgbe.ko ../2.6.32-431.el6.x86_64/kernel/drivers/net/ixgbe/
+[root@DBSEC_DBA dbfw]# depmod 
+
+/*查看所有进程的具体启动时间等*/
+ps -eo pid,lstart,etime,cmd | grep nginx
+
+/*让cpu不报超限*/
+touch /tmp/npc_perform_control 此文件，error报了日志后，再删除
+
+
+/*在Linux系统下获取有关硬件方面的信息*/
+dmidecode
+
+/*查看网卡pci信息*/
+lspci -vvv | grep Ethernet
+
+/*查看网卡是不是silicom卡信息*/
+lspci -vvv | grep -i silicom
+
+/*查看主版对应网卡pci对应的槽位号*/
+ls -l /sys/class/net 
+
+/*查看网卡槽位，是否为bypass卡，最后一个字母为B的为bypass槽位*/
+[root@DBSEC_DBF bin]# ./bp_ctl5132_slot_state 
+Slot1: NSF580C4B
+Slot2: NONE
+Slot3: NSF580F4
+Slot4: NSF580C4B
+silicom查看是否为bypass卡
+bpctl_util all get_bypass
+/*收集bypass信息到表里*/
+cat start_gmon.sh 
+把export全部执行下，然后执行
+./ctlInterface.pl -t 35
+
+/*批量打包*/
+for pcapfile in $(ls *|grep -E "cap"|grep -v "aaa");do date '+%y-%m-%d %H:%M:%S';echo $pcapfile;./meter_broadcast --worker 1 --loop 1 --pps 18000 eth5 $pcapfile > /dev/null;date "+%y-%m-%d %H:%M:%S";echo "------------------------------------------";done
+
+
+另
+bug856需要看一下有没有npf宕机（开内存泄露的包）
+
+1.离线修表有可能被OOM杀掉
+
+2.create user oracle定义为DDL mysql定义为DCL
+
+3.for_tls表没有唯一建，如果重复插入时，tla会报错,如出现此种场景会出现统计重复
+
+4.维护平台需要做手动修与自动修的互斥，如果出现修表进行中的情况，不可以手动进行修复历史分区表，因为手动修时优先级高 ？还未修改，但是4.4要修改
+
+5.索引出现丢数据模式时有逻辑，丢够500万等等。。。
+
+6.自增列回退未来要做。。。。
+
+7.在恢复已清理的分区时，如果存在相应_bad文件需要恢复（且修复时），才会把clear_flag更为0，其它的不涉及恢复_bad文件的分区表（如果有过修复记录，clear_flag不更为0，因为不涉及修复，所以不影响），如出现新的表修复，相应分区会有新的值更新，维护平台会显示出来，在备份之前的修复记录在维护平台不再显示
+
+5.109 119 65        
+
+
+
+/*查sql模板语句*/
+
+SELECT
+	t1.throughPut,
+	date_format(
+		t1.maxtime,
+		'%Y-%m-%d %H:%i:%s'
+	) AS beginTime,
+	t1.sqlid AS sqlId,
+	t1.database_id AS auditObjId,
+	SUBSTR(
+		sqllog.sql_text,
+		1,
+		char_length(sqllog.sql_text) - 5
+	) AS sqlText,
+	sqllog.sqltype_1 AS sqltype1,
+  sqllog.sqltype_2 AS sqltype2,
+	sql1.ruleName AS relatedRuleName
+FROM
+	(
+		SELECT
+			sum(throughPut) AS throughPut,
+			max(maxtime) AS maxtime,
+			sqlid,
+			database_id,
+			dbfw_inst_id
+		FROM
+			(
+				SELECT
+					sum(s1.sql_throughput) AS throughPut,
+					max(maxtime) AS maxtime,
+					s1.database_id,
+					s1.sqlid,
+					s1.dbfw_inst_id
+				FROM
+					summary_sql_forsession_hour AS s1
+				WHERE
+					s1.dbfw_inst_id = 1
+				AND s1.database_id in (5,6,9)
+	
+				GROUP BY
+					s1.sqlid
+				UNION ALL
+					SELECT
+						sum(s1.sql_throughput) AS throughPut,
+						max(maxtime) AS maxtime,
+						s1.database_id,
+						s1.sqlid,
+						s1.dbfw_inst_id
+					FROM
+						summary_sql_forsession AS s1
+					WHERE
+						s1.dbfw_inst_id = 1
+					AND s1.database_id in (5,6,9)
+
+					GROUP BY
+						s1.sqlid
+			) AS sumTotal
+		GROUP BY
+			sqlid
+		ORDER BY
+			maxtime DESC,
+			sqlid DESC
+		LIMIT 0,
+		100000
+	) t1
+LEFT JOIN sqllog_event sqllog ON t1.sqlid = sqllog.sqlid
+AND t1.dbfw_inst_id = sqllog.dbfw_inst_id
+LEFT JOIN (
+	SELECT
+		r1.database_id,
+		r1.sqlid,
+		GROUP_CONCAT(
+			CONCAT(
+				r3.rule_name,
+				',',
+				CAST(r3.rule_id AS CHAR),
+				',',
+				r3.risk_level,
+				',',
+				r2.state
+			)
+			ORDER BY
+				r2.ordinal ASC SEPARATOR ';'
+		) AS ruleName
+	FROM
+		rule_excluded_sql_relation r1
+	LEFT JOIN rule_db_relation r2 ON r1.database_id = r2.database_id
+	AND r1.rule_id = r2.rule_id
+	LEFT JOIN rule_main r3 ON r1.rule_id = r3.rule_id
+	WHERE
+		r2.isdelete = 0
+	AND r3.isdelete = 0
+	AND r1.database_id in (5,6,9)
+	GROUP BY
+		r1.database_id,
+		r1.sqlid
+) sql1 ON sql1.sqlid = t1.sqlid;   
+
+
+
+/*查看bypass命令相关*/
+
+/bp_ctl5130 1(group_id) set_bypass_pwon   info
+
+./bp_ctl5132_slot_state 
+./bp_ctl5132_slot_state  d
+./bp_ctl5132_slot_state  get_bypass_slot
+./bp_ctl5132  get 0 0 0 0 0  查看bypass状态
+./ctlInterface.pl -t 35
+uname -r
+./ctlInterface.pl -t 35
+cat start_gmon.sh 
+export DBFW_HOME=/home/dbfw/dbfw
+export DBFW_INSTANCE_FILE_PATH=$DBFW_HOME/etc
+export PATH=$PATH:$DBFW_HOME/bin
+export LD_LIBRARY_PATH=$DBFW_HOME/lib:$LD_LIBRARY_PATH
+./ctlInterface.pl -t 35
+lspci 
+./bp_ctl5132_slot_state  get_bypass_slot
+lspci 
+vi NetworkAPI.pm 
+cat /var/tmp/board_vendor 
+pwd
+cat /tmp/dpdk/eth_pci_map 
+cat /tmp/dpdk/pci_board_map 
+pwd
+./get_eth_info.py 
+./get_eth_info.py "NEXCOM 1000U"
+cat /etc/producttype 
+vi get_eth_info.py 
+cat /etc/producttype 
+cat /tmp/dpdk/pci_board_map 
+cat /var/tmp/board_vendor 
+
+/*查看网卡驱动，卸载，加载网卡驱动命令相关,以silicom为例*/
+
+查看
+modinfo /lib/modules/dbfw/ixgbe.ko
+卸载
+rmmod ixgbe
+加载
+insmod /lib/modules/dbfw/ixgbe.ko
+查看是否加载成功
+lsmod|grep ixgbe
+
+卸载加载网卡命令，万兆卡
+/sbin/rmmod ixgbe
+modprobe ixgbe
+执行后需要重启网络
+
+/*查看产品硬件名称*/
+dmidecode |grep "Product Name"
+
+/*升级包解压缩*/
+
+ dd if=ALL_Patch_jdk1.8_pre.rur|/usr/bin/openssl enc -aes-128-cbc -d -pass pass:schinadbfw |tar zxf - --directory=./   
+
+/*查看网络端口常用命令*/
+netstat -tnlp  t tcp n 不显示别名 l LISTEN p 程序名
+
+/*sysctl arp_ignore 参数值，决定了网口对包的应答，有时间现细研究下*/
+arp_ignore定义了对目标地址为本机IP的ARP询问的不同应答模式。
+arp_announce对网络接口（网卡）上发出的ARP请求包中的源IP地址作出相应的限制；主机会根据这个参数值的不同选择使用IP数据包的源IP或当前网络接口卡的IP地址作为ARP请求包的源IP地址
+
+作者：JSON_NULL
+链接：https://www.jianshu.com/p/a682ecae9693
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+协议栈、校验核、一个请求会引发后续多次交互
+
+/*拦截阻断*/
+分包的长语句，命中拦截规则即阻断
+应答方向规则，无拦截规则
+
+
+
+/*npls_mon日志第一条不对,第二条对*/
+last block is 1, now block is 1, iptables count is 1
+last block is 1, now block is 1, iptables count is 0
+
+
+
+
+/*走没走语法树，看哪个区的哪个值啊？*/
+stmt区sqltype 单语句非语法树 2 多语句  3 单语句 语法树单语句
+stmt区sqltype 1. 单语句非语法树 2 多语句  3 单语句 语法树单语句
+
+
+/*查看网卡是否在bond里*/
+cat /proc/net/bonding/bond0  bondm
+cat /etc/sysconfig/network-scripts/ifcfg-eth0  看网卡是否在bond中
+
+
+/*不支持透明代理和代理*/
+HBase、MongoDB、Redis、Impala、Sentry、HDFS
+(注：后期Redis支持了，有个现场用）
+
+/* 透明代理各种规则*/
+1.正常的
+    0     0 REDIRECT   tcp  --  br3    *       0.0.0.0/0            192.168.0.111       tcp dpt:3306 redir ports 10058 
+2.放行，异常 （老连接可连，新连接可连）
+    -D 以上
+3.保持，异常 (老连接可连，新连接不可连）
+    0     0 REDIRECT   tcp  --  br3    *       0.0.0.0/0            192.168.0.111       tcp dpt:3306 state NEW 
+    0     0 REDIRECT   tcp  --  br3    *       0.0.0.0/0            192.168.0.111       tcp dpt:3306 redir ports 10058
+4.dc异常（老连接不可连，新连接可连）
+    0     0 REDIRECT   tcp  --  br3    *       0.0.0.0/0            192.168.0.111       tcp dpt:3306 state ESTABLISHED redir ports 10058
+
+/* 代理各种规则*/
+老连接，新连接全阻断
+    0     0 DROP       tcp  --  eth2   *       0.0.0.0/0            192.168.50.61       tcp dpt:10000 state NEW 
+老连接放行，新连接阻断
+   12   480 DROP       tcp  --  eth2   *       0.0.0.0/0            192.168.50.61       tcp dpt:10000 state NEW,RELATED,ESTABLISHED 
+老连接放行，新连接放行
+    0     0 DNAT       tcp  --  eth2   *       0.0.0.0/0            192.168.50.61       tcp dpt:10000 state NEW,RELATED,ESTABLISHED to:192.168.0.110:3306 
+    0     0 MASQUERADE  tcp  --  *      *       0.0.0.0/0            192.168.0.110       tcp dpt:3306
+    0     0 ACCEPT     tcp  --  eth2   *       0.0.0.0/0            0.0.0.0/0           state NEW tcp dpt:3306 
+
+
+/*3.2.4.6代理测试总结*/
+1.管理网卡及子接口的代理与其它网卡要分别测试，包括异常转发等
+2.代理高可用，管理口或管理子接口开启iptables转发后，建的连接，关闭转发后，连接不会断
+3.停止实例开启iptables转发，实例挂起npp转发
+4.为什么在保持模式时iptables drop规则设置失败后，内存超限连不上，而cpu超限却能连上，问问研发？
+5.为什么这个版本会话超限比设置值少1？
+6.重启实例会把ip rule规则整体初始化，所以在升级时不用考虑因上一版本出现多余规则且删除不了的情况 
+
+/*3.2.4.7代理测试总结*/
+/dbfw_bkup/network_backup.0  值格式
+npls_info[i].group_id, npls_info[i].devname, npls_info[i].group_ip,npls_info[i].group_port,
+npls_info[i].db_ip,npls_info[i].db_port,npls_info[i].realdev, npls_info[i].port_type,npls_info[i].group_type
+有两个地不明白，1）npls_info[i].port_type，这个在什么情况下会出现其它值呢？2）子接口的时候这个是记子接口的id嘛？npls_info[i].group_id 3)主备切换查看网卡状态是看的npls_info[i].realdev这个嘛？
+1）ipv6 2）应该是主接口的 3)是的
+
+/*主备针对管理网卡的限制说明*/
+1. 1）主备管理网卡需要同时为"冗余",且冗余中的网卡名称相同
+  2）主备管理网卡不为"冗余"时,管理网卡名称需要相同
+
+2.对于先上架的机器，再部署主备时，不支持自动部署（因预留group_id的问题）
+
+3.**特别重要**：每次发版前要与上个版本had对接一下，以免升级时对接不上
+
+
+/*查看端口*/
+windows
+netstat -ano|findstr str
+linux
+netstat -anlpt|grep str
+
+
+/*stmt区，objects区 ab切换*/
+change_count 切换次数，默认为0
+
+空间满或达到640000切换
+
+
+/*7.128打包平台，打包命令及打包日志*/
+/tmp/buildpackage.log
+
+
+/*bypass分组设备手动开启后，生成文件*/
+ll /dev/shm/bypass_online_enable_group_(bypass_nc_id)
+bpctl_online.sh 参数（setBypassOnlineType，前台传入）
+
+/* 网桥如果对插线，会显示断开*/
+因为要一个网卡的link up需要以另一个卡为up为前提才可以up
+但这种情况 下重启下实例，两个网卡共同up就可以启来
+
+/*/var/tmp/skip_backup_driver文件中型号的作用*/
+1、是为了区分el6下，老的型号的机器（除文件列表内的设备）这个目录是不是创建：/lib/modules/dbfw/ 目录及驱动，也许并删除系统驱动目录、也许老的设备就没有系统驱动目录
+2、el7下，所有型号的机器（包括文件内的）都不创建/lib/modules/dbfw/ 目录及驱动
+
+3、bpctl_start.sh的作用是开机时加载网卡驱动
+加载时会看是否有系统驱动目录，来进行相关驱动备份及产品驱动进行覆盖
+
+4、depmod命令是刷新一下系统所有的驱动
+
+
+
+/*bypass测试总结1*/
+1、dc异常bypass导通，要分组，全局分别测；网桥、透明代理分别测，曾经测出来过bug
+2、掉电bypass要，第一组网卡，和后边组的网卡分别测（全局，分组情况），曾经测出来过bug
+3、网桥或透明代理进入假死，要第一对br和后边br分别测，（有过bug:当时只用了第一个网卡组的bind状态)
+4.有些网卡对插灯不亮，在这种情况下，过完bypass,灯也不会亮
+5.silicom网卡在关机bypass后，bypass灯是不亮的，需要看对端网卡
+6.此日志的意思是，在安装的时候，silicom网卡先初始化开，再初始化关。
+[Terminal Message]: check find silicom nic, set auto poweroff bypass invalid 
+check insmod module bpctl_mod success
+86:00.0 eth8 ok
+86:00.1 eth9 slave
+[Terminal Message]: check find silicom nic, set auto poweroff bypass effective 
+check insmod module bpctl_mod success
+check new device node success
+86:00.0 eth8 ok
+86:00.1 eth9 slave
+7.分组及全局bypass（或各种机型），半透明网桥 程序异常bypass导通，要分别测试，曾经有bug（恢复时间不是在recover基础上+1分钟）
+8.iptables设置成功bypass恢复，有问题！
+
+
+/*bypass总结相关2*/
+1.全局网卡情况下要测下非第一组网卡为bypass时，发现过bug
+  且网桥，半透明网桥要分别测，假死等也要分别测
+2.silicom和5130混合时（全局与分组混合），./bpctl_util all get_bypass 查出来的状态结果不一定正确
+3.5174网卡，在用命令查bypass状态时，会导致nfw进入假死逻辑
+4.停实例后，用小程序查bypass 掉电状态，为on时，关机应该可以进入bypass导通
+5./etc/soft_bypass_pwup_bk0.sh /etc/soft_bypass_pwup_bk1.sh
+  此两个脚本是为了进行dc异常的，nfw会时不时更新，或更改设置时更新
+  前一个为开机时开机脚本调，后一个为上一次的设置（备份）
+  这个脚本中的 pci值要为16进制（与lspci的值一样），十进制会有问题 曾经有过bug
+6.dc异常后，再掉电，掉电bypass不会生效，因为掉电是nfw往寄存器写的
+
+/*管云上要的两个域名*/
+mysql5.7
+rm-hp3183a3j5ds29l86go.mysql.huhehaote.rds.aliyuncs.com   用户名：zhang  密码：Schina1234
+rm-hp39afy27h7099gx93o.mysql.huhehaote.rds.aliyuncs.com这个数据库开了ssl，对你有影响吗
+
+
+/*高可用总结*/
+1.管理口当代理后，心跳线也不能用，因为代理切了也用不了。。
+2.**重要**：新旧版本had需要能建上连接，测试安装包的时候要测下，不然升级会有问题
+3.ha心跳检测，主备机需要一致，每次是检测值/检测次数
+
+/*nfw、dpdk总结*/
+1.旁路网卡个数限制，dpdk
+el6 30个
+el7 32个
+2.没有分别判断网卡包与数据库的匹配，任一网卡加入，即抓全部
+3.ha备机状态不工作，所以不会环路（iptables,drop网卡对dpdk不起作用）
+4.会话超限，bind失败超过10次才触发，看error_recv日志
+
+/*关于gmon*/
+1.gmon只有checkgmon.sh来进行保活，smon不管这个进程
+2.checkgmon.sh把检查周期如果pid为null时，调整为了10s，
+3.gmon把写pid文件的时间改为了120s
+
+/*关于ip被占用*/
+arping有可能报不出来，也有可能操作系统报不出错来，这时候就检查不到ip冲突，ip就被配置上了
+
+
+/*升级包总结*/
+1.安装会更param_config_default.sql文件的 在线数据的参数值 ，系统版本的值
+2.恢复出厂会更新在线数据的参数值 ，不会更新系统版本的值 ，所以此文件的值要在升级包里更新进去
+
+
+/*网卡总结*/
+1.ifconfig eth0 promisc 设置混杂
+  ifconfig eth0 -promisc　取消混杂
+  (对于silicom卡好像得设置，不设置不能用，在混杂模式下的网卡能够接收一切通过它的数据，而不管该数据目的地址是否是它）
+2.sar -n DEV 1  查看网卡流量
+
+3.千兆所有卡用的igb，万兆卡用的silicom用的ixgbe，ixgbe.ko（el6)或ixgbe.ko.xz(el7)
+  如果是万兆silicom卡如果驱动不对，可能会出现各种问题；普通万兆卡，可能再去找系统下别的驱动（不一定有问题）
+
+
+
+
+dbfw       1753   1673  0 17:29 pts/0    00:00:00 /bin/bash ./build.sh DBA_apple
+dbfw       1768   1753  0 17:29 pts/0    00:00:00 /bin/bash -x build_fire.sh AA
+dbfw       2249   1768  0 17:31 pts/0    00:00:00 /bin/bash -x /home/dbfw/web-auto/Install/build_web.sh
+
+总大小        magic = 1398031476
+下一个sqlid   next_sqlid = 340953     
+              free_size = 504316458
+              row_count = 340953
+              next_sql_rowid = 151043543
+stmt 一个AB：Buff Data Area
+objects 分三个AB：Buff Owner Area、Buff Table Area、Buff Relation Area
+
+ 
+只改变包里数据内容，不改变长度
+
+代理建出来的npp与其它模式建出的不一样
+
+npls_server只看是不是sync包，从而建立npp_proxy、proxy建npp
+
+npp从、拿包，scoket是tcp连接后（系统级）
+
+proxy在npp宕机后，可以从pcap机制缓存拿包，保证代理三通
+代理三通定义：引入proxy保活npp的机制叫代理三通，拍出来的名字
+
+dpdk,内核态和用户态
+
+
+
+/*未修复问题总结*/
+
+v5设备网卡加载慢，，，导致DC异常时，bypass很久才导通，，，但是功能是对的。。。
+
+
+
+/*Url短信告警平台*/
+https://192.168.110.223/sms/
+https://192.168.110.223/sms/test/
+
+/*超限控制*/
+放行模式，cpu超限，由npp转发。mem超限新连接由proxy转发，老连接kill 20%   剩余80%和原来一样。会话超限，新连接由proxy转发，老连接照常
+
