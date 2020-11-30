@@ -5,7 +5,7 @@ product_file_list=(
 	/home/dbfw/dbfw  
 	/dbfw_capbuf
 	/usr/local/tomcat
-	/usr/local/rmagent
+	/usr/local/rmagent/rmagent-disk
 	/home/conadmin/menu.sh
 	/usr/local/apache
 	/usr/local/apr
@@ -24,9 +24,10 @@ product_file_list=(
         /usr/lib/perl5_lib
         /usr/lib64/perl5
         /usr/share/snmp
-        /var/tmp/
+        /var/tmp
         /tmp/dpdk
-        /etc/init.d/stopdbfw
+	/etc/init.d/stopdbfw
+	#/usr/local/bin
         /usr/local/bin/StartDbfw
         /usr/local/bin/stopdbfw
         /usr/local/bin/dcserverd
@@ -36,11 +37,92 @@ product_file_list=(
         /etc/sysconfig/arptables
         /etc/sysconfig/ebtables
 	/dev/shm/
+	/etc/sudoers
 	/etc/producttype
 	/dbfw_data/dbfw
 	/dbfw_data/dbfw_capbuf
 	/dbfw_data/tomcat
 	/dbfw_data/apache
+	/usr/local/authtool
+	/usr/lib/systemd/system/controldbfw.service
+	/usr/lib/systemd/system/dcserverd2.service
+	/usr/lib/systemd/system/dcserverd.service
+	/usr/lib/systemd/system/initpart.service
+	/etc/security/limits.conf
+	/etc/pam.d/login
+	/etc/profile
+	/lib/modules/dbfw
+	/var/spool/cron
+	/var/tmp/board_vendor
+	/etc/ntp/ntpservers
+	/etc/rsyslog.conf
+	/etc/resolv.conf
+	/etc/sysconfig/network
+	/etc/sysconfig/network-scripts
+	/etc/udev/rules.d
+	/etc/iptables/rules.v4
+	/etc/init.d/network_boot.im
+	/etc/init.d/halt
+	/etc/init.d/killall
+	/etc/init.d/mdmonitor
+	/etc/init.d/netconsole
+	/etc/init.d/netfs
+	/etc/init.d/network
+	/etc/init.d/single
+	/etc/init.d/ip6tables
+	/etc/init.d/iptables
+	/etc/init.d/irqbalance
+	/etc/selinux/config
+	/etc/modprobe.d
+	/etc/init/serial.conf
+	/etc/sudoers
+	/etc/logrotate.d/tomcat
+	/usr/lib/jre164
+	/usr/kafka
+	/usr/local/ukeyclient
+	/usr/lib64/libsecureServiceAPI.so
+	/usr/lib64/libsecureServiceGmonAPI.so
+	/usr/lib64/libACE.so.5.6.5
+	/usr/lib64/libACE_SSL.so.5.6.5
+	/usr/lib64/libssl.so.0.9.8
+	/usr/lib64/libsystemdevice.so
+	/usr/lib64/libcrypto.so.0.9.8
+	/usr/lib64/libdbfwRewrite.so
+	/usr/lib64/libmysql.so.16
+	/usr/bin/apply
+	/usr/bin/daemon
+	/etc/ssh/sshd_config
+	/etc/apt/sources.list
+	/etc/acpi/events/power.conf
+	/etc/snmp/snmpd.conf
+	/etc/rc.d/init.d/rsyslog
+	/etc/rc.d/init.d/iptables
+	/etc/rc.d/init.d/ip6tables
+	/etc/rc.d/init.d/snmpd
+	/etc/rc.d/init.d/vsftpd
+	/etc/vsftpd/vsftpd.conf
+	/etc/vsftpd.conf
+	/etc/rc.d/init.d/crond
+	/etc/rc.d/init.d/lldpad
+	/etc/sysconfig/irqbalance
+	/etc/sysconfig/nfs
+	/etc/logrotate.conf
+	/etc/passwd
+	/home/dbfw/.bash_profile
+	/etc/run_environment
+	/etc/producttype
+	/etc/bashrc
+	/root/.bash_profile
+	/root/.bashrc
+	/etc/rc.d/rc.sysinit
+	/lib/systemd/system/rescue.service
+	/etc/rc.d/init.d/functions
+	/etc/had/ha_status
+	/usr/local/bin/initcloudpart.sh
+	/usr/local/bin/initpart
+	/usr/local/bin/top
+	/boot/grub/grub.cfg
+	/boot/grub2/grub.cfg
 )
 
 ## no create md5 file ##
@@ -48,6 +130,11 @@ no_create_md5_list=(
 	"/home/dbfw/dbfw/bin/*.pid"
 	"/home/dbfw/dbfw/bin/*.out"
 	"/home/dbfw/dbfw/lib/*.a"
+	"/home/dbfw/dbfw/*.log"
+	"/home/dbfw/dbfw/*.pid"
+	"/home/dbfw/dbfw/etc/*_INST"
+	"/home/dbfw/dbfw/bin/*.pyc"
+	
 	/home/dbfw/dbfw/scripts/dc/funcsvn.log
 	/usr/local/tomcat/webapps/ROOT/WEB-INF/report-engine/logs	
 
@@ -225,10 +312,20 @@ cp -af /etc/sysconfig/ip6tables $configfile
 ip6tables -L -n -v >> $configfile/ip6tables_cmd.txt
 cp -af /etc/sysconfig/arptables $configfile
 arptables -L -n -v >> $configfile/arptables_cmd.txt
-cp -af /etc/sysconfig/etables $configfile
+cp -af /etc/sysconfig/ebtables $configfile
+ebtables --list >> $configfile/ebtables_cmd.txt
+cp -af /etc/sudoers $configfile
 crontab -l >> $configfile/crontab.txt
+cp -af /boot/grub2/grub.cfg $configfile/grub2_grub.cfg
+cp -af /boot/grub/grub.cfg $configfile/grub_grub.cfg
 
 cp -af /dbfw_bkup/dc/ $configfile
+cp -af /etc/security/limits.conf $configfile
+
+cp -af /etc/ssh/sshd_config $configfile
+
+cp -af /etc/sysconfig/network-scripts/ifup* $configfile
+cp -af /etc/sysconfig/network-scripts/ifdown* $configfile
 
 dbfwsystem_table="$dump_file/dbfwsystem_table"
 mkdir $dbfwsystem_table
@@ -237,23 +334,23 @@ mkdir $dbfwsystem_table
 ##dir permission
 dir_permission="$dump_file/dir_permission"
 product_dir_list=(
-        /home/dbfw/dbfw
-        /dbfw_capbuf
-        /usr/local/tomcat
-        /usr/local/rmagent
-        /home/conadmin/menu.sh
-        /usr/local/apache
-        /usr/local/apr
-        /usr/local/apr-util
-        /usr/local/pcre
-        /usr/share/fonts/chinese
-        /etc/init.d/dcserverd
-        /etc/init.d/dcserverd2
-        /usr/local/focus
-        /usr/local/freetds
-        /etc/init.d/initcloudpart
-        /etc/init.d/StartDbfw
-        /usr/lib/jdk17
+	/home/dbfw/dbfw  
+	/dbfw_capbuf
+	/usr/local/tomcat
+	/usr/local/rmagent
+	/home/conadmin/menu.sh
+	/usr/local/apache
+	/usr/local/apr
+	/usr/local/apr-util
+	/usr/local/pcre
+	/usr/share/fonts/chinese
+	/etc/init.d/dcserverd
+	/etc/init.d/dcserverd2
+	/usr/local/focus
+	/usr/local/freetds
+	/etc/init.d/initcloudpart
+	/etc/init.d/StartDbfw
+	/usr/lib/jdk17
         /usr/lib/jdk18
         /usr/local/netdata
         /usr/lib/perl5_lib
@@ -261,7 +358,8 @@ product_dir_list=(
         /usr/share/snmp
         /var/tmp/
         /tmp/dpdk
-        /etc/init.d/stopdbfw
+	/etc/init.d/stopdbfw
+	/usr/local/bin
         /usr/local/bin/StartDbfw
         /usr/local/bin/stopdbfw
         /usr/local/bin/dcserverd
@@ -271,11 +369,92 @@ product_dir_list=(
         /etc/sysconfig/arptables
         /etc/sysconfig/ebtables
 	/dev/shm/
+	/etc/sudoers
 	/etc/producttype
 	/dbfw_data/dbfw
 	/dbfw_data/dbfw_capbuf
 	/dbfw_data/tomcat
 	/dbfw_data/apache
+	/usr/local/authtool
+	/usr/lib/systemd/system/controldbfw.service
+	/usr/lib/systemd/system/dcserverd2.service
+	/usr/lib/systemd/system/dcserverd.service
+	/usr/lib/systemd/system/initpart.service
+	/etc/security/limits.conf
+	/etc/pam.d/login
+	/etc/profile
+	/lib/modules/dbfw
+	/var/spool/cron
+	/var/tmp/board_vendor
+	/etc/ntp/ntpservers
+	/etc/rsyslog.conf
+	/etc/resolv.conf
+	/etc/sysconfig/network
+	/etc/sysconfig/network-scripts
+	/etc/udev/rules.d
+	/etc/iptables/rules.v4
+	/etc/init.d/network_boot.im
+	/etc/init.d/halt
+	/etc/init.d/killall
+	/etc/init.d/mdmonitor
+	/etc/init.d/netconsole
+	/etc/init.d/netfs
+	/etc/init.d/network
+	/etc/init.d/single
+	/etc/init.d/ip6tables
+	/etc/init.d/iptables
+	/etc/init.d/irqbalance
+	/etc/selinux/config
+	/etc/modprobe.d
+	/etc/init/serial.conf
+	/etc/sudoers
+	/etc/logrotate.d/tomcat
+	/usr/lib/jre164
+	/usr/kafka
+	/usr/local/ukeyclient
+	/usr/lib64/libsecureServiceAPI.so
+	/usr/lib64/libsecureServiceGmonAPI.so
+	/usr/lib64/libACE.so.5.6.5
+	/usr/lib64/libACE_SSL.so.5.6.5
+	/usr/lib64/libssl.so.0.9.8
+	/usr/lib64/libsystemdevice.so
+	/usr/lib64/libcrypto.so.0.9.8
+	/usr/lib64/libdbfwRewrite.so
+	/usr/lib64/libmysql.so.16
+	/usr/bin/apply
+	/usr/bin/daemon
+	/etc/ssh/sshd_config
+	/etc/apt/sources.list
+	/etc/acpi/events/power.conf
+	/etc/snmp/snmpd.conf
+	/etc/rc.d/init.d/rsyslog
+	/etc/rc.d/init.d/iptables
+	/etc/rc.d/init.d/ip6tables
+	/etc/rc.d/init.d/snmpd
+	/etc/rc.d/init.d/vsftpd
+	/etc/vsftpd/vsftpd.conf
+	/etc/vsftpd.conf
+	/etc/rc.d/init.d/crond
+	/etc/rc.d/init.d/lldpad
+	/etc/sysconfig/irqbalance
+	/etc/sysconfig/nfs
+	/etc/logrotate.conf
+	/etc/passwd
+	/home/dbfw/.bash_profile
+	/etc/run_environment
+	/etc/producttype
+	/etc/bashrc
+	/root/.bash_profile
+	/root/.bashrc
+	/etc/rc.d/rc.sysinit
+	/lib/systemd/system/rescue.service
+	/etc/rc.d/init.d/functions
+	/etc/had/ha_status
+	/usr/local/bin/initcloudpart.sh
+	/usr/local/bin/initpart
+	/usr/local/bin/top
+	/boot/grub/grub.cfg
+	/boot/grub2/grub.cfg
 )
 dirlist_permission()
 {
@@ -303,11 +482,10 @@ for product_dir in "${product_dir_list[@]}"
 ##Softlink files
 ln_files="$dump_file/ln_files"
 product_dir_list=(
-	/home/dbfw/dbfw
+	/home/dbfw/dbfw  
 	/dbfw_capbuf
-	/dbfw_data/dbfw
 	/usr/local/tomcat
-	/usr/local/rmagent/rmagent-dist
+	/usr/local/rmagent
 	/home/conadmin/menu.sh
 	/usr/local/apache
 	/usr/local/apr
@@ -328,7 +506,8 @@ product_dir_list=(
         /usr/share/snmp
         /var/tmp/
         /tmp/dpdk
-        /etc/init.d/stopdbfw
+	/etc/init.d/stopdbfw
+	/usr/local/bin
         /usr/local/bin/StartDbfw
         /usr/local/bin/stopdbfw
         /usr/local/bin/dcserverd
@@ -338,11 +517,92 @@ product_dir_list=(
         /etc/sysconfig/arptables
         /etc/sysconfig/ebtables
 	/dev/shm/
+	/etc/sudoers
 	/etc/producttype
 	/dbfw_data/dbfw
 	/dbfw_data/dbfw_capbuf
 	/dbfw_data/tomcat
 	/dbfw_data/apache
+	/usr/local/authtool
+	/usr/lib/systemd/system/controldbfw.service
+	/usr/lib/systemd/system/dcserverd2.service
+	/usr/lib/systemd/system/dcserverd.service
+	/usr/lib/systemd/system/initpart.service
+	/etc/security/limits.conf
+	/etc/pam.d/login
+	/etc/profile
+	/lib/modules/dbfw
+	/var/spool/cron
+	/var/tmp/board_vendor
+	/etc/ntp/ntpservers
+	/etc/rsyslog.conf
+	/etc/resolv.conf
+	/etc/sysconfig/network
+	/etc/sysconfig/network-scripts
+	/etc/udev/rules.d
+	/etc/iptables/rules.v4
+	/etc/init.d/network_boot.im
+	/etc/init.d/halt
+	/etc/init.d/killall
+	/etc/init.d/mdmonitor
+	/etc/init.d/netconsole
+	/etc/init.d/netfs
+	/etc/init.d/network
+	/etc/init.d/single
+	/etc/init.d/ip6tables
+	/etc/init.d/iptables
+	/etc/init.d/irqbalance
+	/etc/selinux/config
+	/etc/modprobe.d
+	/etc/init/serial.conf
+	/etc/sudoers
+	/etc/logrotate.d/tomcat
+	/usr/lib/jre164
+	/usr/kafka
+	/usr/local/ukeyclient
+	/usr/lib64/libsecureServiceAPI.so
+	/usr/lib64/libsecureServiceGmonAPI.so
+	/usr/lib64/libACE.so.5.6.5
+	/usr/lib64/libACE_SSL.so.5.6.5
+	/usr/lib64/libssl.so.0.9.8
+	/usr/lib64/libsystemdevice.so
+	/usr/lib64/libcrypto.so.0.9.8
+	/usr/lib64/libdbfwRewrite.so
+	/usr/lib64/libmysql.so.16
+	/usr/bin/apply
+	/usr/bin/daemon
+	/etc/ssh/sshd_config
+	/etc/apt/sources.list
+	/etc/acpi/events/power.conf
+	/etc/snmp/snmpd.conf
+	/etc/rc.d/init.d/rsyslog
+	/etc/rc.d/init.d/iptables
+	/etc/rc.d/init.d/ip6tables
+	/etc/rc.d/init.d/snmpd
+	/etc/rc.d/init.d/vsftpd
+	/etc/vsftpd/vsftpd.conf
+	/etc/vsftpd.conf
+	/etc/rc.d/init.d/crond
+	/etc/rc.d/init.d/lldpad
+	/etc/sysconfig/irqbalance
+	/etc/sysconfig/nfs
+	/etc/logrotate.conf
+	/etc/passwd
+	/home/dbfw/.bash_profile
+	/etc/run_environment
+	/etc/producttype
+	/etc/bashrc
+	/root/.bash_profile
+	/root/.bashrc
+	/etc/rc.d/rc.sysinit
+	/lib/systemd/system/rescue.service
+	/etc/rc.d/init.d/functions
+	/etc/had/ha_status
+	/usr/local/bin/initcloudpart.sh
+	/usr/local/bin/initpart
+	/usr/local/bin/top
+	/boot/grub/grub.cfg
+	/boot/grub2/grub.cfg
 )
 ln_files()
 	{

@@ -11,7 +11,7 @@ product_file_list=(
     /home/dbfw/dbfw
     /dbfw_capbuf
     /usr/local/tomcat
-    /usr/local/rmagent/rmagent-dist
+    /usr/local/rmagent/rmagent-disk
     /home/conadmin/menu.sh
     /usr/local/apache
     /usr/local/apr
@@ -20,19 +20,20 @@ product_file_list=(
     /usr/share/fonts/chinese
     /etc/init.d/dcserverd
     /etc/init.d/dcserverd2
-    /usr/local/focus
-    /usr/local/freetds
     /etc/init.d/initcloudpart
     /etc/init.d/StartDbfw
+    /etc/init.d/stopdbfw
+    /usr/local/focus
+    /usr/local/freetds
     /usr/lib/jdk17
     /usr/lib/jdk18
     /usr/local/netdata
     /usr/lib/perl5_lib
     /usr/lib64/perl5
     /usr/share/snmp
-    /var/tmp/
+    /var/tmp
     /tmp/dpdk
-    /etc/init.d/stopdbfw
+    #/usr/local/bin
     /usr/local/bin/StartDbfw
     /usr/local/bin/stopdbfw
     /usr/local/bin/dcserverd
@@ -45,6 +46,86 @@ product_file_list=(
     /dbfw_data/dbfw_capbuf
     /dbfw_data/tomcat
     /dbfw_data/apache
+    /usr/local/authtool
+    /usr/lib/systemd/system/controldbfw.service
+    /usr/lib/systemd/system/dcserverd2.service
+    /usr/lib/systemd/system/dcserverd.service
+    /usr/lib/systemd/system/initpart.service
+    /etc/security/limits.conf
+    /etc/pam.d/login
+    /etc/profile
+    /lib/modules/dbfw
+    /var/spool/cron
+    /var/tmp/board_vendor
+    /etc/ntp/ntpservers
+    /etc/rsyslog.conf
+    /etc/resolv.conf
+    /etc/sysconfig/network
+    /etc/sysconfig/network-scripts
+    /etc/udev/rules.d
+    /etc/iptables/rules.v4
+    /etc/init.d/network_boot.im
+    /etc/init.d/halt
+    /etc/init.d/killall
+    /etc/init.d/mdmonitor
+    /etc/init.d/netconsole
+    /etc/init.d/netfs
+    /etc/init.d/network
+    /etc/init.d/single
+    /etc/init.d/ip6tables
+    /etc/init.d/iptables
+    /etc/init.d/irqbalance
+    /etc/selinux/config
+    /etc/modprobe.d
+    /etc/init/serial.conf
+    /etc/sudoers
+    /etc/logrotate.d/tomcat
+    /usr/lib/jre164
+    /usr/kafka
+    /usr/local/ukeyclient
+    /usr/lib64/libsecureServiceAPI.so
+    /usr/lib64/libsecureServiceGmonAPI.so
+    /usr/lib64/libACE.so.5.6.5
+    /usr/lib64/libACE_SSL.so.5.6.5
+    /usr/lib64/libssl.so.0.9.8
+    /usr/lib64/libsystemdevice.so
+    /usr/lib64/libcrypto.so.0.9.8
+    /usr/lib64/libdbfwRewrite.so
+    /usr/lib64/libmysql.so.16
+    /usr/bin/apply
+    /usr/bin/daemon
+    /etc/ssh/sshd_config
+    /etc/apt/sources.list
+    /etc/acpi/events/power.conf
+    /etc/snmp/snmpd.conf
+    /etc/rc.d/init.d/rsyslog
+    /etc/rc.d/init.d/iptables
+    /etc/rc.d/init.d/ip6tables
+    /etc/rc.d/init.d/snmpd
+    /etc/rc.d/init.d/vsftpd
+    /etc/vsftpd/vsftpd.conf
+    /etc/vsftpd.conf
+    /etc/rc.d/init.d/crond
+    /etc/rc.d/init.d/lldpad
+    /etc/sysconfig/irqbalance
+    /etc/sysconfig/nfs
+    /etc/logrotate.conf
+    /etc/passwd
+    /home/dbfw/.bash_profile
+    /etc/run_environment
+    /etc/producttype
+    /etc/bashrc
+    /root/.bash_profile
+    /root/.bashrc
+    /etc/rc.d/rc.sysinit
+    /lib/systemd/system/rescue.service
+    /etc/rc.d/init.d/functions
+    /etc/had/ha_status
+    /usr/local/bin/initcloudpart.sh
+    /usr/local/bin/initpart
+    /usr/local/bin/top
+    /boot/grub/grub.cfg
+    /boot/grub2/grub.cfg
 )
 
 ## no create md5 file ##
@@ -52,6 +133,10 @@ no_create_md5_list=(
     "/home/dbfw/dbfw/bin/*.pid"
     "/home/dbfw/dbfw/bin/*.out"
     "/home/dbfw/dbfw/lib/*.a"
+    "/home/dbfw/dbfw/*.log"
+    "/home/dbfw/dbfw/*.pid"
+    "/home/dbfw/dbfw/etc/*_INST"
+    "/home/dbfw/dbfw/bin/*.pyc"
     /dbfw_capbuf
     /home/dbfw/dbfw/scripts/dc/funcsvn.log
     /usr/local/tomcat/work
@@ -187,14 +272,11 @@ do
 done
 
 ## sysctl param ##
-cat /etc/sysctl.conf > $sysctl_file
+sysctl -p | sort | uniq > $sysctl_file
 
 cp -af ./$dump_file/local_files/dbfw/etc/dbfw50.ini $dump_file/
 cp -af ./$dump_file/local_files/dbfw/etc/totalconfig.lst $dump_file/
 cp -af ./$dump_file/local_files/tomcat/webapps/ROOT/WEB-INF/configures.properties $dump_file/
-cp -af ./$dump_file/local_files/tomcat/webapps/MMS/WEB-INF/configures.properties $dump_file/
-cp -af ./$dump_file/local_files/dbfw/etc/sql_kafka_dataflow_fields.ini $dump_file/
-cp -af ./$dump_file/local_files/dbfw/etc/csv_dataflow_fields.ini $dump_file/
 
 exit 0;
 

@@ -7,18 +7,19 @@
 
 ###########################################################
 ## 说明:
-## 1.在老的环境上执行执行此脚本（传参数 1）
-## 2.把升级时涉及的sql文件放入此目录,
+## 1.在老的环境上执行执行此脚本（传参数 1）,生成table_name_list.txt
+## 2.在老的环境上执行cp /home/dbfw/dbfw/scripts/repairtable/conf/table_type_info ./
+## 3.把升级时涉及的sql文件放入此目录,
 ##   如：addition.sh addition_new.sql vpatch_deal.sql等
-## 3.把addition.sh里所有涉及的.sql文件及上边的那几个文件
+## 4.把addition.sh里所有涉及的.sql文件及上边的那几个文件
 ##   放入列表file_dir_list
-## 4.把关于存储过程的注释掉,因为存储过程涉及的表太多
-## 5.在安装包环境或升级完的环境执行此脚本
+## 5.把关于存储过程的注释掉,因为存储过程涉及的表太多
+## 6.在安装包环境或升级完的环境执行此脚本
 ###########################################################
 
 if [[ $1 -eq 1 ]];then
 	table_name_list=""
-	for table_filename in `ls /dbfw_dc/dbfw/`
+	for table_filename in `ls /dbfw_dc/dbfw/ |grep -v -E ".MYI|.MYD"`
 		do
 			#echo ${table_filename}
 			table_filename=${table_filename%%.*}	
@@ -46,23 +47,19 @@ echo $table_name_list
 SCRIPTS_HOME="/home/dbfw/dbfw/scripts/dc"
 file_dir_list=(
 #"$SCRIPTS_HOME/dbaa_new_summary_procedure.sql"
-"$SCRIPTS_HOME/dbfw_dbversion.sql"
-"$SCRIPTS_HOME/dbfw_sqltype_data.sql"
-"$SCRIPTS_HOME/dbfw_sqltype_detail_data.sql"
+"$SCRIPTS_HOME/dbfw_error_msg.sql"
 "$SCRIPTS_HOME/dbfw_syslog_filetype.sql"
-"$SCRIPTS_HOME/dbfw_xsec_dictionary_data.sql"
 #"$SCRIPTS_HOME/procedure.sql"
 "$SCRIPTS_HOME/user_permission_url.sql"
-"$SCRIPTS_HOME/dbfw_dbscan.sql"
-"$SCRIPTS_HOME/dbfw_report_pre_store.sql"
-"$SCRIPTS_HOME/log_template_data.sql"
-"$SCRIPTS_HOME/log_template_detail_data.sql"
-"$SCRIPTS_HOME/log_type_data.sql"
-"$SCRIPTS_HOME/product_about.sql"
-"./addition.sh"
-"./addition_new.sql"
-"./addition_new2.sql"
-"./backup.sql"
+./addition/addition_dbaa.sql
+./addition/addition_dbctrl.sql
+./addition/addition_dbfw.sql
+./addition/addition_dbfwusers.sql
+./addition/addition_dbmd.sql
+./addition/addition_new.sql
+./addition/addition.sh
+./addition/addition_u_role.sql
+./addition/backup.sql
 )
 
 echo "############################################################################"
@@ -90,7 +87,7 @@ echo -e $upgrade_table_list
 upgrade_table_list=(`echo -e $upgrade_table_list|sort -u`)
 echo "upgrade_table_list=${#upgrade_table_list[@]}"
 
-table_info_file=/home/dbfw/dbfw/scripts/repairtable/conf/table_type_info
+table_info_file="./table_type_info"
 table_config_list=($(cat $table_info_file|awk '{if($3 == "config"){print $1}}'))
 echo "table_config_list=${#table_config_list[@]}"
 
